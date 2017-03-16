@@ -434,55 +434,70 @@ case UIImageOrientationDownMirrored:
             orientation = ALAssetOrientationRight;
         }
 
-        // task 1
-        dispatch_group_enter(group);
-        [library writeImageToSavedPhotosAlbum:previewImage orientation:ALAssetOrientationUp completionBlock:^(NSURL *assetURL, NSError *error) {
-          if (error) {
-            NSLog(@"FAILED to save Preview picture.");
-            photosAlbumError = error;
-          } else {
-            previewPicturePath = [assetURL absoluteString];
-            NSLog(@"previewPicturePath: %@", previewPicturePath);
-          }
-          dispatch_group_leave(group);
-        }];
 
-        //task 2
-        dispatch_group_enter(group);
-        [library writeImageToSavedPhotosAlbum:finalImage orientation:orientation completionBlock:^(NSURL *assetURL, NSError *error) {
-          if (error) {
-            NSLog(@"FAILED to save Original picture.");
-            photosAlbumError = error;
-          } else {
-            originalPicturePath = [assetURL absoluteString];
-            NSLog(@"originalPicturePath: %@", originalPicturePath);
-          }
-          dispatch_group_leave(group);
-        }];
+//        // task 1
+//        dispatch_group_enter(group);
+//        [library writeImageToSavedPhotosAlbum:previewImage orientation:ALAssetOrientationUp completionBlock:^(NSURL *assetURL, NSError *error) {
+//          if (error) {
+//            NSLog(@"FAILED to save Preview picture.");
+//            photosAlbumError = error;
+//          } else {
+//            previewPicturePath = [assetURL absoluteString];
+//            NSLog(@"previewPicturePath: %@", previewPicturePath);
+//          }
+//          dispatch_group_leave(group);
+//        }];
+//
+//        //task 2
+//        dispatch_group_enter(group);
+//        [library writeImageToSavedPhotosAlbum:finalImage orientation:orientation completionBlock:^(NSURL *assetURL, NSError *error) {
+//          if (error) {
+//            NSLog(@"FAILED to save Original picture.");
+//            photosAlbumError = error;
+//          } else {
+//            originalPicturePath = [assetURL absoluteString];
+//            NSLog(@"originalPicturePath: %@", originalPicturePath);
+//          }
+//          dispatch_group_leave(group);
+//        }];
+//
+//        dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+//            NSMutableArray *params = [[NSMutableArray alloc] init];
+//            if (photosAlbumError) {
+//            // Error returns just one element in the returned array
+//            NSString * remedy = @"";
+//            if (-3311 == [photosAlbumError code]) {
+//            remedy = @"Go to Settings > CodeStudio and allow access to Photos";
+//            }
+//            [params addObject:[NSString stringWithFormat:@"CameraPreview: %@ - %@ — %@", [photosAlbumError localizedDescription], [photosAlbumError localizedFailureReason], remedy]];
+//            } else {
+//            // Success returns two elements in the returned array
+//            UIImage *resultImage = [UIImage imageWithCGImage:finalImage];
+//            double radiants = [self radiansFromUIImageOrientation:resultImage.imageOrientation];
+//            CGImageRef resultFinalImage = [self CGImageRotated:finalImage withRadiants:radiants];
+//
+//            NSString *base64Image = [self getBase64Image:resultFinalImage];
+//            [params addObject:base64Image];
+//            }
+//
+//            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:params];
+//            [pluginResult setKeepCallbackAsBool:true];
+//            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.onPictureTakenHandlerId];
+//        });
 
-        dispatch_group_notify(group, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-            NSMutableArray *params = [[NSMutableArray alloc] init];
-            if (photosAlbumError) {
-            // Error returns just one element in the returned array
-            NSString * remedy = @"";
-            if (-3311 == [photosAlbumError code]) {
-            remedy = @"Go to Settings > CodeStudio and allow access to Photos";
-            }
-            [params addObject:[NSString stringWithFormat:@"CameraPreview: %@ - %@ — %@", [photosAlbumError localizedDescription], [photosAlbumError localizedFailureReason], remedy]];
-            } else {
-            // Success returns two elements in the returned array
-            UIImage *resultImage = [UIImage imageWithCGImage:finalImage];
-            double radiants = [self radiansFromUIImageOrientation:resultImage.imageOrientation];
-            CGImageRef resultFinalImage = [self CGImageRotated:finalImage withRadiants:radiants];
 
-            NSString *base64Image = [self getBase64Image:resultFinalImage];
-            [params addObject:base64Image];
-            }
+          NSMutableArray *params = [[NSMutableArray alloc] init];
+          // Success returns two elements in the returned array
+          UIImage *resultImage = [UIImage imageWithCGImage:finalImage];
+          double radiants = [self radiansFromUIImageOrientation:resultImage.imageOrientation];
+          CGImageRef resultFinalImage = [self CGImageRotated:finalImage withRadiants:radiants];
 
-            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:params];
-            [pluginResult setKeepCallbackAsBool:true];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.onPictureTakenHandlerId];
-        });
+          NSString *base64Image = [self getBase64Image:resultFinalImage];
+          [params addObject:base64Image];
+
+          CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:params];
+          [pluginResult setKeepCallbackAsBool:true];
+          [self.commandDelegate sendPluginResult:pluginResult callbackId:self.onPictureTakenHandlerId];
       }
     }];
 }
