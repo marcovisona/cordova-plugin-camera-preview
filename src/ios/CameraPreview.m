@@ -492,8 +492,17 @@ case UIImageOrientationDownMirrored:
           double radiants = [self radiansFromUIImageOrientation:resultImage.imageOrientation];
           CGImageRef resultFinalImage = [self CGImageRotated:finalImage withRadiants:radiants];
 
-          NSString *base64Image = [self getBase64Image:resultFinalImage];
-          [params addObject:base64Image];
+
+          NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+          NSString *filePath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%f.jpg", [[NSDate date] timeIntervalSince1970]]];
+
+          // Convert UIImage object into NSData (a wrapper for a stream of bytes) formatted according to JPG spec
+          imageData = UIImageJPEGRepresentation([UIImage imageWithCGImage:resultFinalImage], quality); // quality level 85%
+          [imageData writeToFile:filePath atomically:YES];
+
+          CGImageRelease(resultFinalImage); // release CGImageRef to remove memory leaks
+          [params addObject:filePath];
+
 
           CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:params];
           [pluginResult setKeepCallbackAsBool:true];
