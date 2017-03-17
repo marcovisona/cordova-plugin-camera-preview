@@ -96,7 +96,7 @@ CameraPreview.setFlashMode = function(flashMode, onSuccess, onError) {
     flashMode = 1;
   }else if(flashMode === 'auto'){
     flashMode = 2;
-  }else if(flashMode === 'torch' && navigator.userAgent.match(/Android/i)  == "Android"){
+  }else if(flashMode === 'torch'){
     flashMode = 3;
   }else{
     return false;

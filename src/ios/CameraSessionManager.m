@@ -59,6 +59,7 @@
       }
 
       AVCaptureDevice * videoDevice = [self cameraWithPosition: self.defaultCamera];
+      self.device = videoDevice;
 
       if ([videoDevice hasFlash] && [videoDevice isFlashModeSupported:AVCaptureFlashModeAuto]) {
         if ([videoDevice lockForConfiguration:&error]) {
@@ -178,15 +179,26 @@
         self.defaultFlashMode = AVCaptureFlashModeOn;
       } else if (flashMode == AVCaptureFlashModeOff) {
         self.defaultFlashMode = AVCaptureFlashModeOff;
-      } else if (flashMode == AVCaptureFlashModeAuto) {
+      } else if (flashMode == 3) {
         self.defaultFlashMode = AVCaptureFlashModeAuto;
       }
 
       [self.device setFlashMode:self.defaultFlashMode];
       [self.device unlockForConfiguration];
       NSLog(@"%zd hey", self.defaultFlashMode);
-    } else {
-      errMsg = @"This device has no flash";
+    }
+
+      if ([self.device hasTorch]) {
+          [self.device lockForConfiguration:nil];
+
+          if (flashMode == 2) {
+              self.defaultFlashMode = AVCaptureTorchModeOn;
+          }
+
+          [self.device setTorchMode:self.defaultFlashMode];
+          [self.device unlockForConfiguration];
+          NSLog(@"%zd hey", self.defaultFlashMode);
+
     }
   } else {
     errMsg = @"Session is not started";
