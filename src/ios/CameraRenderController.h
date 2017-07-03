@@ -11,15 +11,19 @@
 
 @protocol TakePictureDelegate
 - (void) invokeTakePicture;
+- (void) invokeTakePictureOnFocus;
 @end;
 
-@interface CameraRenderController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate> {
+@protocol FocusDelegate
+- (void) invokeTapToFocus:(CGPoint)point;
+@end;
+
+@interface CameraRenderController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, OnFocusDelegate> {
   GLuint _renderBuffer;
   CVOpenGLESTextureCacheRef _videoTextureCache;
   CVOpenGLESTextureRef _lumaTexture;
 }
 
-@property (nonatomic) GLKView *view;
 @property (nonatomic) CameraSessionManager *sessionManager;
 @property (nonatomic) CIContext *ciContext;
 @property (nonatomic) CIImage *latestFrame;
@@ -27,6 +31,7 @@
 @property (nonatomic) NSLock *renderLock;
 @property BOOL dragEnabled;
 @property BOOL tapToTakePicture;
+@property BOOL tapToFocus;
 @property (nonatomic, assign) id delegate;
 
 @end
